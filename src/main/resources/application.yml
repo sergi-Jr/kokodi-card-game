@@ -1,0 +1,22 @@
+spring:
+  application:
+  name: cardzen
+  profiles:
+    default: dev
+  jpa:
+    properties:
+      hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  output:
+    ansi:
+      enabled: always
+
+rsa.private-key: classpath:certs/private.pem
+rsa.public-key: classpath:certs/public.pem

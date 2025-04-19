@@ -1,0 +1,19 @@
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+  spring:
+    jpa:
+      hibernate:
+        ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org:hibernate:dialect:PostgreSQLDialect
+    datasource:
+      url: ${JDBC_DATABASE_URL}
+      username: ${USERNAME}
+      password: ${PASSWORD}
+
+  logging:
+    level:
+      root: WARN
