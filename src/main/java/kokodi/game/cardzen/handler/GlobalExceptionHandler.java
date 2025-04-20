@@ -1,5 +1,6 @@
 package kokodi.game.cardzen.handler;
 
+import kokodi.game.cardzen.exception.DuplicateResourceException;
 import kokodi.game.cardzen.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,5 +13,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<String> handleResourceDuplicated(DuplicateResourceException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 }
