@@ -1,12 +1,14 @@
 package kokodi.game.cardzen.user.dal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kokodi.game.cardzen.exception.DuplicateResourceException;
 import kokodi.game.cardzen.exception.ResourceNotFoundException;
 import kokodi.game.cardzen.user.dto.UserCreateDto;
 import kokodi.game.cardzen.user.dto.UserDto;
 import kokodi.game.cardzen.user.dto.UserUpdateDto;
 import kokodi.game.cardzen.user.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,19 +37,27 @@ public class UserService {
     @Transactional
     public UserDto create(UserCreateDto dto) {
         User user = userMapper.toEntity(dto);
-        User resultUser = userRepository.save(user);
-        return userMapper.toUserDto(resultUser);
+        try {
+            User resultUser = userRepository.save(user);
+            return userMapper.toUserDto(resultUser);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateResourceException("User already exists");
+        }
     }
 
     @Transactional
-    public UserDto patch(UUID id, UserUpdateDto dto) throws IOException {
+    public UserDto patch(UUID id, UserUpdateDto dto) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Entity with id `%s` not found".formatted(id)));
 
         userMapper.updateWithNull(dto, user);
 
-        User resultUser = userRepository.save(user);
-        return userMapper.toUserDto(resultUser);
+        try {
+            User resultUser = userRepository.save(user);
+            return userMapper.toUserDto(resultUser);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateResourceException("User already exists");
+        }
     }
 
     @Transactional
