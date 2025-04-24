@@ -35,6 +35,8 @@ dependencies {
 	implementation("net.datafaker:datafaker:2.2.2")
 	implementation("org.instancio:instancio-junit:4.8.0")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+	implementation("org.springframework.boot:spring-boot-starter-websocket:3.4.4")
+	implementation("org.springframework:spring-messaging:6.2.5")
 
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -48,6 +50,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testCompileOnly("org.projectlombok:lombok")
 
 	testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.7")
