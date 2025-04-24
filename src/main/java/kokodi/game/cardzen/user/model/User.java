@@ -1,11 +1,15 @@
 package kokodi.game.cardzen.user.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import kokodi.game.cardzen.gamesession.model.GameSession;
 import kokodi.game.cardzen.model.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -34,25 +40,25 @@ public class User implements UserDetails, BaseEntity {
     @ToString.Include
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-//    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.REFRESH},
-//    orphanRemoval = true, fetch = FetchType.LAZY)
-//    private Set<GameSession> games = new HashSet<>();
-//
-//    public void addGame(GameSession game) {
-//        games.add(game);
-//        game.setUser(this);
-//    }
-//
-//    public void removeGame(GameSession game) {
-//        games.removeIf(g -> g.getId() == game.getId());
-//        game.setUser(null);
-//    }
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.REFRESH},
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<GameSession> games = new HashSet<>();
+
+    public void addGame(GameSession game) {
+        games.add(game);
+        game.setUser(this);
+    }
+
+    public void removeGame(GameSession game) {
+        games.removeIf(g -> Objects.equals(g.getId(), game.getId()));
+        game.setUser(null);
+    }
 
     @Override
     public final boolean equals(Object o) {

@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kokodi.game.cardzen.user.dal.UserMapper;
 import kokodi.game.cardzen.user.dal.UserRepository;
 import kokodi.game.cardzen.user.model.User;
-import net.datafaker.Faker;
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import kokodi.game.cardzen.util.EntityGenerator;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +35,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private Faker faker;
+    private EntityGenerator generator;
 
     @Autowired
     private ObjectMapper mapper;
@@ -56,23 +54,10 @@ class UserControllerTest {
 
     private User user;
 
-    private User generateUser() {
-        return Instancio.of(User.class)
-                .ignore(Select.field(User::getId))
-                //.ignore(Select.field(User::getGames))
-                .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
-                .supply(Select.field(User::getName), () -> {
-                    String nickname = faker.internet().username();
-                    return nickname.length() <= 14 ? nickname : nickname.substring(0, 14);
-                })
-                .supply(Select.field(User::getPassword), () -> faker.internet().password(3, 10))
-                .create();
-    }
-
     @BeforeEach
     void setup() {
-        wrong = generateUser();
-        user = generateUser();
+        wrong = generator.generateUser();
+        user = generator.generateUser();
         token = jwt().jwt(builder -> builder.subject(user.getName()));
         wrongToken = jwt().jwt(b -> b.subject(wrong.getName()));
         repository.save(user);
@@ -103,7 +88,7 @@ class UserControllerTest {
     @Test
     @Order(3)
     void testCreate() throws Exception {
-        User user1 = generateUser();
+        User user1 = generator.generateUser();
 
         var request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +106,7 @@ class UserControllerTest {
     @Test
     @Order(4)
     void testCreateNoAuth() throws Exception {
-        User user1 = generateUser();
+        User user1 = generator.generateUser();
 
         var request = post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
