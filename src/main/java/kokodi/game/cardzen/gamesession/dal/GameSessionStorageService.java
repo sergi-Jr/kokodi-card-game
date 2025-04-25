@@ -1,6 +1,7 @@
 package kokodi.game.cardzen.gamesession.dal;
 
 import kokodi.game.cardzen.component.InMemoryGameStorage;
+import kokodi.game.cardzen.exception.DuplicateResourceException;
 import kokodi.game.cardzen.exception.ResourceNotFoundException;
 import kokodi.game.cardzen.gamesession.dto.GamePlayTurnDto;
 import kokodi.game.cardzen.gamesession.dto.GameSessionStorageInfoDto;
@@ -21,6 +22,8 @@ public class GameSessionStorageService {
 
     private final InMemoryGameStorage gameStorage;
 
+    private final GameSessionMapper gameSessionMapper;
+
     public GameSessionStorage getStorageByGameId(Long gameId) {
         return gameStorage.getStorageByGameId(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Game with id: %s not found".formatted(gameId)));
@@ -29,15 +32,7 @@ public class GameSessionStorageService {
     public GameSessionStorageInfoDto getGameSessionStorageInfo(Long gameId) {
         GameSessionStorage storage = gameStorage.getStorageByGameId(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Game with id: %s not found".formatted(gameId)));
-        GameSessionStorageInfoDto dto = new GameSessionStorageInfoDto();
-        dto.setPlayersCount(storage.getPlayersCount());
-        dto.setPlayersWithPoints(storage.getUserIdsWithPoints());
-        dto.setStatus(storage.getStatus());
-        dto.setTopDeckCard(storage.getTopDeckCard());
-        dto.setCurrentDeckSize(storage.getCurrentDeckSize());
-        dto.setActivePlayerId(storage.getActivePlayerId());
-
-        return dto;
+        return gameSessionMapper.toStorageInfoDto(storage);
     }
 
     @Transactional
@@ -54,7 +49,9 @@ public class GameSessionStorageService {
     public void joinGame(Long gameId, UUID newPlayerId) {
         GameSessionStorage gameSessionStorage = gameStorage.getStorageByGameId(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Game with id: %s not found".formatted(gameId)));
-
+        if (gameSessionStorage.getUserIdsWithPoints().containsKey(newPlayerId)) {
+            throw new DuplicateResourceException("You already in this game!");
+        }
         synchronized (gameSessionStorage) {
             if (gameSessionStorage.getStatus() == GameSessionStatus.WAITING_PLAYERS
                     && gameSessionStorage.getPlayersCount() < 4) {
