@@ -28,11 +28,12 @@ public class GameSessionStorage {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private Map<UUID, Integer> userIdsWithPoints;
+    private Map<UUID, Integer> userIdsWithPoints = new HashMap<>();
 
     private GameSessionStatus status;
 
     public void addUserId(UUID userId) {
+        userIdsWithPoints.put(userId, 0);
         usersIdQueue.add(userId);
     }
 
@@ -41,11 +42,6 @@ public class GameSessionStorage {
     }
 
     public void createUsersTurnsQueue() {
-        userIdsWithPoints = new HashMap<>();
-        for (var id : usersIdQueue) {
-            userIdsWithPoints.put(id, 0);
-        }
-
         var tempUsersIdsList = List.copyOf(usersIdQueue);
         while (usersIdQueue.size() < 100) { //move magic number to .prop file
             usersIdQueue.addAll(tempUsersIdsList);
