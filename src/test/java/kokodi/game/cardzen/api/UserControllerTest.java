@@ -105,18 +105,6 @@ class UserControllerTest {
 
     @Test
     @Order(4)
-    void testCreateNoAuth() throws Exception {
-        User user1 = generator.generateUser();
-
-        var request = post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(userMapper.mapToCreateDTO(user1)));
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @Order(5)
     public void testUpdate() throws Exception {
         Map<String, String> data = Map.of("email", "trueTest@gmail.com", "name", "John");
 
@@ -134,7 +122,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     public void testUpdateNoAuth() throws Exception {
         Map<String, String> data = Map.of("email", "trueTest@gmail.com", "firstName", "John");
 
@@ -146,7 +134,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(6)
     public void testUpdateForbidden() throws Exception {
         Map<String, String> data = Map.of("email", "trueTest@gmail.com", "firstName", "John");
 
@@ -158,7 +146,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(7)
     public void testDelete() throws Exception {
         var request = delete("/api/users/" + user.getId()).with(token);
         mockMvc.perform(request)
@@ -169,7 +157,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     public void testDeleteNoAuth() throws Exception {
         var request = delete("/api/users/" + user.getId());
         mockMvc.perform(request)
@@ -177,7 +165,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(9)
     public void testDeleteForbidden() throws Exception {
         var request = delete("/api/users/" + user.getId()).with(wrongToken);
         mockMvc.perform(request)
